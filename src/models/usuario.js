@@ -22,6 +22,11 @@ const Usuario = sequelize.define("Usuario", {
   puntos: {
     type: DataTypes.INTEGER,
     defaultValue: 0
+  },
+  rol: {
+    type: DataTypes.ENUM("ADMIN", "USER"),
+    allowNull: false,
+    defaultValue: "USER"
   }
 }, {
   tableName: "usuarios",
@@ -29,4 +34,3 @@ const Usuario = sequelize.define("Usuario", {
 });
 
 module.exports = Usuario;
-

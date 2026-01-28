@@ -6,9 +6,18 @@ const VueloOferta = sequelize.define("VueloOferta", {
     primaryKey: true,
     autoIncrement: true
   },
-  origen: DataTypes.TEXT,
-  destino: DataTypes.TEXT,
-  precio: DataTypes.DECIMAL
+  origen: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  destino: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  precio: {
+    type: DataTypes.DECIMAL(10,2),
+    allowNull: false
+  }
 }, {
   tableName: "vuelos_oferta",
   timestamps: false

@@ -11,7 +11,15 @@ const Reserva = sequelize.define("Reserva", {
     defaultValue: DataTypes.NOW
   },
   total: {
-    type: DataTypes.DECIMAL,
+    type: DataTypes.DECIMAL(10,2),
+    allowNull: false
+  },
+  id_usuario: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  id_vuelo: {
+    type: DataTypes.INTEGER,
     allowNull: false
   }
 }, {

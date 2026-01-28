@@ -1,4 +1,5 @@
-const { sequelize, DataTypes } = require("./database");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("./database");
 
 const Pasajero = sequelize.define("Pasajero", {
   id_pasajero: {
@@ -6,8 +7,27 @@ const Pasajero = sequelize.define("Pasajero", {
     primaryKey: true,
     autoIncrement: true
   },
-  nombre: DataTypes.TEXT,
-  documento: DataTypes.TEXT
+  nombre: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  apellido: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  documento: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  id_reserva: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: "reservas",
+      key: "id_reserva"
+    },
+    onDelete: "CASCADE"
+  }
 }, {
   tableName: "pasajeros",
   timestamps: false
