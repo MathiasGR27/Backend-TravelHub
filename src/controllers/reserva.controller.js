@@ -1,6 +1,7 @@
 const Reserva = require("../models/reserva");
 const VueloOferta = require("../models/vueloOferta");
 const Pasajero = require("../models/pasajero");
+const usuario = require("../models/usuario");
 
 // CREAR RESERVA
 const crearReserva = async (req, res) => {
@@ -68,28 +69,44 @@ const misReservas = async (req, res) => {
     const reservas = await Reserva.findAll({
       where: { id_usuario: req.usuario.id },
       include: [
-        { model: VueloOferta },
-        { model: Pasajero }
+        { model: VueloOferta, as: "vuelo" },
+        { model: Pasajero, as: "pasajeros" }
       ]
     });
 
-    res.json(reservas);
+    const resultado = reservas.map(r => ({
+      id_reserva: r.id_reserva,
+      fecha_reserva: r.fecha_reserva,
+      total: r.total,
+      vuelo: {
+        origen: r.vuelo.origen,
+        destino: r.vuelo.destino,
+        precio: r.vuelo.precio
+      },
+      cantidad_pasajeros: r.pasajeros.length
+    }));
+
+    res.json(resultado);
+
   } catch (error) {
     res.status(500).json({ message: "Error al obtener reservas" });
   }
 };
+
 
 //VER TODAS LAS RESERVAS ADMIN
 const verTodasLasReservas = async (req, res) => {
   try {
     const reservas = await Reserva.findAll({
       include: [
-        { model: VueloOferta },
-        { model: Pasajero }
+        { model: usuario, as: "usuario", attributes: ["nombre", "email"] },
+        { model: VueloOferta, as: "vuelo" },
+        { model: Pasajero, as: "pasajeros" }
       ]
     });
 
     res.json(reservas);
+
   } catch (error) {
     res.status(500).json({ message: "Error al obtener reservas" });
   }

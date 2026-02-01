@@ -17,6 +17,10 @@ const VueloOferta = sequelize.define("VueloOferta", {
   precio: {
     type: DataTypes.DECIMAL(10,2),
     allowNull: false
+  },
+  fecha_salida: {
+    type: DataTypes.DATEONLY, // 👈 CLAVE
+    allowNull: false
   }
 }, {
   tableName: "vuelos_oferta",

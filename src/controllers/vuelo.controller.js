@@ -3,9 +3,13 @@ const VueloOferta = require("../models/vueloOferta");
 // CREAR VUELO 
 const crearVuelo = async (req, res) => {
   try {
-    const { origen, destino, precio } = req.body;
+    const { origen, destino, precio, fecha_salida } = req.body;
 
-    const vuelo = await VueloOferta.create({ origen, destino, precio });
+    const vuelo = await VueloOferta.create({ origen, destino, precio, fecha_salida });
+
+    if (!origen || !destino || !precio || !fecha_salida) {
+      return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
 
     res.status(201).json({
       message: "Vuelo creado correctamente",
@@ -29,13 +33,18 @@ const listarVuelos = async (req, res) => {
 // BUSCAR VUELOS
 const buscarVuelos = async (req, res) => {
   try {
-    const { origen, destino } = req.query;
+    const { origen, destino, fecha } = req.query;
 
-    const vuelos = await VueloOferta.findAll({
-      where: { origen, destino }
-    });
+    const where = {};
+
+    if (origen) where.origen = origen;
+    if (destino) where.destino = destino;
+    if (fecha) where.fecha_salida = fecha;
+
+    const vuelos = await VueloOferta.findAll({ where });
 
     res.json(vuelos);
+
   } catch (error) {
     res.status(500).json({ message: "Error al buscar vuelos" });
   }
@@ -45,14 +54,14 @@ const buscarVuelos = async (req, res) => {
 const editarVuelo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { origen, destino, precio } = req.body;
+    const { origen, destino, precio, fecha_salida } = req.body;
 
     const vuelo = await VueloOferta.findByPk(id);
     if (!vuelo) {
       return res.status(404).json({ message: "Vuelo no encontrado" });
     }
 
-    await vuelo.update({ origen, destino, precio });
+    await vuelo.update({ origen, destino, precio, fecha_salida });
 
     res.json({ message: "Vuelo actualizado", vuelo });
   } catch (error) {
