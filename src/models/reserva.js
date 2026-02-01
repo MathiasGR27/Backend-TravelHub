@@ -21,6 +21,11 @@ const Reserva = sequelize.define("Reserva", {
   id_vuelo: {
     type: DataTypes.INTEGER,
     allowNull: false
+  },
+  estado: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "PENDIENTE"
   }
 }, {
   tableName: "reservas",

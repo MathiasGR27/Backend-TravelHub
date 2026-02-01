@@ -6,8 +6,22 @@ const Pago = sequelize.define("Pago", {
     primaryKey: true,
     autoIncrement: true
   },
-  metodo: DataTypes.TEXT,
-  monto: DataTypes.DECIMAL
+  monto: {
+    type: DataTypes.DECIMAL(10,2),
+    allowNull: false
+  },
+  metodo: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  fecha_pago: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  id_reserva: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  }
 }, {
   tableName: "pagos",
   timestamps: false
