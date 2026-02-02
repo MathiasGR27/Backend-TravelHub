@@ -1,20 +1,22 @@
 const VueloOferta = require("../models/vueloOferta");
+const { Op } = require("sequelize");
 
 // CREAR VUELO 
 const crearVuelo = async (req, res) => {
   try {
     const { origen, destino, precio, fecha_salida } = req.body;
 
-    const vuelo = await VueloOferta.create({ origen, destino, precio, fecha_salida });
-
     if (!origen || !destino || !precio || !fecha_salida) {
       return res.status(400).json({ message: "Todos los campos son obligatorios" });
     }
+
+    const vuelo = await VueloOferta.create({origen,destino,precio,fecha_salida});
 
     res.status(201).json({
       message: "Vuelo creado correctamente",
       vuelo
     });
+
   } catch (error) {
     res.status(500).json({ message: "Error al crear el vuelo" });
   }
@@ -33,19 +35,42 @@ const listarVuelos = async (req, res) => {
 // BUSCAR VUELOS
 const buscarVuelos = async (req, res) => {
   try {
-    const { origen, destino, fecha } = req.query;
+    const {origen,destino,fecha,minPrecio,maxPrecio,ordenPrecio} = req.query;
 
     const where = {};
+    const order = [];
 
+    // Origen y destino
     if (origen) where.origen = origen;
     if (destino) where.destino = destino;
+
+    // Fecha de salida
     if (fecha) where.fecha_salida = fecha;
 
-    const vuelos = await VueloOferta.findAll({ where });
+    // Rango de precios
+    if (minPrecio || maxPrecio) {
+      where.precio = {};
+      if (minPrecio) where.precio[Op.gte] = minPrecio;
+      if (maxPrecio) where.precio[Op.lte] = maxPrecio;
+    }
+
+    // Ordenar por precio
+    if (ordenPrecio === "asc") {
+      order.push(["precio", "ASC"]);
+    }
+    if (ordenPrecio === "desc") {
+      order.push(["precio", "DESC"]);
+    }
+
+    const vuelos = await VueloOferta.findAll({
+      where,
+      order
+    });
 
     res.json(vuelos);
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error al buscar vuelos" });
   }
 };
