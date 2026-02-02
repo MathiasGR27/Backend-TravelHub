@@ -19,7 +19,7 @@ const VueloOferta = sequelize.define("VueloOferta", {
     allowNull: false
   },
   fecha_salida: {
-    type: DataTypes.DATEONLY, // 👈 CLAVE
+    type: DataTypes.DATEONLY, 
     allowNull: false
   }
 }, {
