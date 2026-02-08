@@ -1,4 +1,4 @@
-# ✈️ TravelHub API - Sistema de Gestión de Reservas de Vuelos
+# TravelHub API - Sistema de Gestión de Reservas de Vuelos
 
 TravelHub es una API REST profesional construida con **Node.js**, **Express** y **Sequelize**. El sistema permite gestionar el ciclo completo de una agencia de viajes: desde la oferta de vuelos y el registro de pasajeros, hasta un complejo sistema de fidelización por puntos y pagos.
 
