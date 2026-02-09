@@ -5,7 +5,7 @@ const Usuario = require("../models/usuario");
 // REGISTRO
 const register = async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
+    const { nombre, email, password } = req.body; 
 
     const existeUsuario = await Usuario.findOne({ where: { email } });
     if (existeUsuario) {
@@ -19,7 +19,7 @@ const register = async (req, res) => {
       nombre,
       email,
       password: passwordHash,
-      rol: rol === "ADMIN" ? "ADMIN" : "USER"
+      rol: "USER" 
     });
 
     res.status(201).json({
@@ -34,6 +34,32 @@ const register = async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ error: "Error al registrar usuario" });
+  }
+};
+
+// CREAR OTRO ADMIN (Solo accesible por un ADMIN)
+const crearAdmin = async (req, res) => {
+  try {
+    const { nombre, email, password } = req.body;
+
+    const existeUsuario = await Usuario.findOne({ where: { email } });
+    if (existeUsuario) {
+      return res.status(400).json({ message: "El email ya está en uso" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    await Usuario.create({
+      nombre,
+      email,
+      password: passwordHash,
+      rol: "ADMIN" 
+    });
+
+    res.status(201).json({ message: "Nuevo administrador creado con éxito" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al crear administrador" });
   }
 };
 
@@ -53,7 +79,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: usuario.id_usuario,rol: usuario.rol },
+      { id: usuario.id_usuario, rol: usuario.rol },
       process.env.JWT_SECRET || "secreto",
       { expiresIn: "2h" }
     );
@@ -74,4 +100,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+module.exports = { register, login, crearAdmin };
