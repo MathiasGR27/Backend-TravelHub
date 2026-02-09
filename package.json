@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/models/crear-tablas.js && node src/server.js",
-    "dev": "nodemon src/server.js", 
-    "admin": "node seedAdmin.js"
+    "start": "node seedAdmin.js && node src/models/crear-tablas.js && node src/server.js",
+    "dev": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
