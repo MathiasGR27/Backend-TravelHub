@@ -21,6 +21,17 @@ const VueloOferta = sequelize.define("VueloOferta", {
   fecha_salida: {
     type: DataTypes.DATEONLY, 
     allowNull: false
+  },
+  // --- NUEVOS CAMPOS ---
+  hora_salida: {
+    type: DataTypes.TIME,
+    allowNull: false,
+    defaultValue: "12:00:00"
+  },
+  capacidad: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 60 
   }
 }, {
   tableName: "vuelos_oferta",

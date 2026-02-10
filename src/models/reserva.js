@@ -26,7 +26,12 @@ const Reserva = sequelize.define("Reserva", {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: "PENDIENTE"
-  }
+  },
+  codigo_qr: {
+  type: DataTypes.STRING,
+  unique: true,
+  allowNull: true
+}
 }, {
   tableName: "reservas",
   timestamps: false

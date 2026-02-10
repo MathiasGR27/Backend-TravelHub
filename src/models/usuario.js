@@ -6,7 +6,11 @@ const Usuario = sequelize.define("Usuario", {
     primaryKey: true,
     autoIncrement: true
   },
-  nombre: {
+  nombre_completo: { 
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  telefono: { 
     type: DataTypes.TEXT,
     allowNull: false
   },

@@ -7,16 +7,16 @@ const Pasajero = sequelize.define("Pasajero", {
     primaryKey: true,
     autoIncrement: true
   },
-  nombre: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  apellido: {
+  nombre_completo: { 
     type: DataTypes.STRING,
     allowNull: false
   },
   documento: {
     type: DataTypes.STRING,
+    allowNull: false
+  },
+  asiento: {
+    type: DataTypes.STRING(10), 
     allowNull: false
   },
   id_reserva: {

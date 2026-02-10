@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 require("./models");
 
+const cors = require('cors');
+app.use(cors());
 app.use(express.json());
 
 // Rutas
@@ -11,6 +13,7 @@ const vueloRoutes = require("./routes/vuelo.routes");
 const pasajeroRoutes = require("./routes/pasajero.routes");
 const pagos = require("./routes/pago.routes");
 const usuarioRoutes = require("./routes/usuario.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/reservas", reservaRoutes);
@@ -18,6 +21,7 @@ app.use("/api/vuelos", vueloRoutes);
 app.use("/api/pasajeros", pasajeroRoutes);
 app.use("/api/pagos", pagos);
 app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "API TravelHub funcionando 🚀" });

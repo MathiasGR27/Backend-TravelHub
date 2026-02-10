@@ -14,7 +14,6 @@ const obtenerDescuentoPorPuntos = (puntosUsados) => {
   return 0;
 };
 
-
 const confirmarPago = async (req, res) => {
   try {
     const { id_reserva, metodo, usar_puntos, puntos_usar } = req.body;

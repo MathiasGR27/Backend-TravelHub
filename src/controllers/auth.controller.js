@@ -2,10 +2,16 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/usuario");
 
-// REGISTRO
+// REGISTRO DE USUARIO NORMAL
 const register = async (req, res) => {
   try {
-    const { nombre, email, password } = req.body; 
+    // Ajustado a los nuevos campos: nombre_completo y telefono
+    const { nombre_completo, telefono, email, password } = req.body; 
+
+    // Validación básica de campos vacíos
+    if (!nombre_completo || !telefono || !email || !password) {
+      return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
 
     const existeUsuario = await Usuario.findOne({ where: { email } });
     if (existeUsuario) {
@@ -16,7 +22,8 @@ const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     const nuevoUsuario = await Usuario.create({
-      nombre,
+      nombre_completo, 
+      telefono,        
       email,
       password: passwordHash,
       rol: "USER" 
@@ -26,21 +33,23 @@ const register = async (req, res) => {
       message: "Usuario registrado correctamente",
       usuario: {
         id: nuevoUsuario.id_usuario,
-        nombre: nuevoUsuario.nombre,
+        nombre: nuevoUsuario.nombre_completo,
         email: nuevoUsuario.email,
-        rol: nuevoUsuario.rol
+        rol: nuevoUsuario.rol,
+        telefono: nuevoUsuario.telefono
       }
     });
 
   } catch (error) {
+    console.error("Error en Register:", error);
     res.status(500).json({ error: "Error al registrar usuario" });
   }
 };
 
-// CREAR OTRO ADMIN (Solo accesible por un ADMIN)
+// CREAR OTRO ADMIN (Solo accesible por un ADMIN logueado)
 const crearAdmin = async (req, res) => {
   try {
-    const { nombre, email, password } = req.body;
+    const { nombre_completo, telefono, email, password } = req.body;
 
     const existeUsuario = await Usuario.findOne({ where: { email } });
     if (existeUsuario) {
@@ -50,15 +59,25 @@ const crearAdmin = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    await Usuario.create({
-      nombre,
+    const nuevoAdmin = await Usuario.create({
+      nombre_completo,
+      telefono,
       email,
       password: passwordHash,
       rol: "ADMIN" 
     });
 
-    res.status(201).json({ message: "Nuevo administrador creado con éxito" });
+    res.status(201).json({ 
+      message: "Nuevo administrador creado con éxito",
+      usuario: {
+        id: nuevoAdmin.id_usuario,
+        nombre: nuevoAdmin.nombre_completo,
+        rol: nuevoAdmin.rol,
+        telefono: nuevoAdmin.telefono
+      }
+    });
   } catch (error) {
+    console.error("Error en CrearAdmin:", error);
     res.status(500).json({ error: "Error al crear administrador" });
   }
 };
@@ -89,14 +108,16 @@ const login = async (req, res) => {
       token,
       usuario: {
         id: usuario.id_usuario,
-        nombre: usuario.nombre,
+        nombre: usuario.nombre_completo, 
         email: usuario.email,
         puntos: usuario.puntos,
-        rol: usuario.rol
+        rol: usuario.rol ,
+        telefono: usuario.telefono
       }
     });
 
   } catch (error) {
+    console.error("Error en Login:", error);
     res.status(500).json({ error: "Error al iniciar sesión" });
   }
 };
