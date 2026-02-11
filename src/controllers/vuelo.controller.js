@@ -1,5 +1,6 @@
 const VueloOferta = require("../models/vueloOferta");
-const { Op } = require("sequelize");
+const { Op } = require("sequelize")
+
 
 // 1. CREAR VUELO (ADMIN)
 const crearVuelo = async (req, res) => {
@@ -31,8 +32,8 @@ const buscarVuelos = async (req, res) => {
     const { origen, destino, fecha, minPrecio, maxPrecio, ordenPrecio } = req.query;
 
     const where = {};
-    if (origen) where.origen = origen;
-    if (destino) where.destino = destino;
+    if (origen) where.origen = { [Op.iLike]: `%${origen}%` };
+    if (destino) where.destino = { [Op.iLike]: `%${destino}%` } ;
     if (fecha) where.fecha_salida = fecha;
 
     if (minPrecio || maxPrecio) {

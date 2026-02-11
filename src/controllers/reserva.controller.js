@@ -110,39 +110,48 @@ let nombreReal = "Pasajero Principal";
   }
 };
 
-// --- VER MIS RESERVAS (ACTUALIZADO) ---
 const misReservas = async (req, res) => {
   try {
+    // Agregamos un log para ver si llega el ID del usuario
+    console.log("Buscando reservas para usuario ID:", req.usuario.id);
+
     const reservas = await Reserva.findAll({
       where: { id_usuario: req.usuario.id },
       include: [
-        { model: VueloOferta, as: "vuelo" },
+        { 
+          model: VueloOferta, 
+          as: "vuelo" 
+        },
         { 
           model: Pasajero, 
           as: "pasajeros",
-          attributes: ['nombre_completo', 'asiento', 'codigo_qr'] // Incluimos QR y Asiento
+          attributes: ['nombre_completo', 'asiento'] 
         }
       ],
       order: [['id_reserva', 'DESC']]
     });
 
+    // Mapeo con validaciones de existencia (opcional ?. para evitar crash)
     const resultado = reservas.map(r => ({
       id_reserva: r.id_reserva,
       fecha_reserva: r.fecha_reserva,
       estado: r.estado,
       total: r.total,
-      vuelo: {
+      codigo_qr: r.codigo_qr,
+      vuelo: r.vuelo ? {
         origen: r.vuelo.origen,
         destino: r.vuelo.destino,
         fecha: r.vuelo.fecha_salida,
         hora: r.vuelo.hora_salida
-      },
-      pasajeros: r.pasajeros // El frontend usará esto para mostrar los tickets
+      } : null,
+      pasajeros: r.pasajeros || []
     }));
 
     res.json(resultado);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener reservas" });
+    // ESTO ES VITAL: Imprime el error real en tu consola del VS Code/Terminal
+    console.error("ERROR EN MIS RESERVAS:", error); 
+    res.status(500).json({ message: "Error al obtener reservas", details: error.message });
   }
 };
 
