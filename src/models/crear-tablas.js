@@ -8,7 +8,7 @@ const iniciarBaseDeDatos = async () => {
     console.log(" Conexión establecida con PostgreSQL.");
 
     // CAMBIO AQUÍ: force: true borra TODO y recrea las tablas
-    await sequelize.sync({ force: true }); 
+    await sequelize.sync({ alter: true }); 
     console.log(" Base de datos limpia y recreada con éxito.");
 
     process.exit(0);
