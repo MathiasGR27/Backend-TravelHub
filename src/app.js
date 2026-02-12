@@ -1,10 +1,14 @@
 const express = require("express");
+const path = require("path"); // 1. Agrega esta importación al principio
 const app = express();
 require("./models");
 
 const cors = require('cors');
 app.use(cors());
 app.use(express.json());
+
+// 2. AGREGA ESTA LÍNEA AQUÍ (Antes de las rutas)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rutas
 const authRoutes = require("./routes/auth.routes");
