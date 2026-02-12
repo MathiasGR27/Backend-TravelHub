@@ -1,16 +1,19 @@
 const express = require("express");
-const path = require("path"); // 1. Agrega esta importación al principio
-const app = express();
+const path = require("path"); // Importante para manejar rutas de carpetas
+const cors = require('cors');
 require("./models");
 
-const cors = require('cors');
+const app = express(); // Solo una vez
+
+// --- MIDDLEWARES ---
 app.use(cors());
 app.use(express.json());
 
-// 2. AGREGA ESTA LÍNEA AQUÍ (Antes de las rutas)
+// --- LA LÍNEA CLAVE ---
+// Esto le dice a Node: "Si alguien pide /uploads, busca los archivos en la carpeta real llamada uploads"
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Rutas
+// --- RUTAS ---
 const authRoutes = require("./routes/auth.routes");
 const reservaRoutes = require("./routes/reserva.routes");
 const vueloRoutes = require("./routes/vuelo.routes");
