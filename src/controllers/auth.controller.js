@@ -5,12 +5,17 @@ const Usuario = require("../models/usuario");
 // REGISTRO DE USUARIO NORMAL
 const register = async (req, res) => {
   try {
-    // Ajustado a los nuevos campos: nombre_completo y telefono
-    const { nombre_completo, telefono, email, password } = req.body; 
+    // 1. Recibimos confirmPassword del body
+    const { nombre_completo, telefono, email, password, confirmPassword } = req.body; 
 
-    // Validación básica de campos vacíos
-    if (!nombre_completo || !telefono || !email || !password) {
+    // 2. Validación: ¿Están todos los campos?
+    if (!nombre_completo || !telefono || !email || !password || !confirmPassword) {
       return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
+
+    // 3. Validación: ¿Son iguales las contraseñas? (Refuerzo de seguridad)
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Las contraseñas no coinciden" });
     }
 
     const existeUsuario = await Usuario.findOne({ where: { email } });
@@ -49,7 +54,18 @@ const register = async (req, res) => {
 // CREAR OTRO ADMIN (Solo accesible por un ADMIN logueado)
 const crearAdmin = async (req, res) => {
   try {
-    const { nombre_completo, telefono, email, password } = req.body;
+    // 1. Agregamos confirmPassword a la extracción
+    const { nombre_completo, telefono, email, password, confirmPassword } = req.body;
+
+    // 2. Validación de campos obligatorios
+    if (!nombre_completo || !telefono || !email || !password || !confirmPassword) {
+      return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
+
+    // 3. Validación de coincidencia
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Las contraseñas no coinciden" });
+    }
 
     const existeUsuario = await Usuario.findOne({ where: { email } });
     if (existeUsuario) {
