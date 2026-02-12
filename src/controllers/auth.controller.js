@@ -41,6 +41,7 @@ const register = async (req, res) => {
         nombre: nuevoUsuario.nombre_completo,
         email: nuevoUsuario.email,
         rol: nuevoUsuario.rol,
+        foto: nuevoUsuario.foto,
         telefono: nuevoUsuario.telefono
       }
     });
@@ -128,6 +129,7 @@ const login = async (req, res) => {
         email: usuario.email,
         puntos: usuario.puntos,
         rol: usuario.rol ,
+        foto: usuario.foto,
         telefono: usuario.telefono
       }
     });
