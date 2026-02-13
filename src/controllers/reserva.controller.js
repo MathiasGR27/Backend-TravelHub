@@ -21,55 +21,29 @@ const obtenerAsientosOcupados = async (req, res) => {
 // --- CREAR RESERVA (ACTUALIZADO) ---
 const crearReserva = async (req, res) => {
   try {
-    const { id_vuelo, asiento, pasajeros_adicionales } = req.body; 
-    const usuario = req.usuario; // Objeto que viene del middleware
+    const { id_vuelo, listaPasajeros } = req.body; // El front ahora envía 'listaPasajeros'
+    const id_usuario = req.usuario.id;
 
-    // 1. Validar que el vuelo existe
+    // 1. Buscar al usuario en la DB para tener sus datos reales y actualizados
+    const usuarioDB = await Usuario.findByPk(id_usuario);
+    if (!usuarioDB) return res.status(404).json({ message: "Usuario no encontrado" });
+
+    // 2. El primer pasajero de la lista es el "Principal" (el usuario logueado)
+    const principal = listaPasajeros[0];
+
+    // --- MAGIA: ACTUALIZAR CÉDULA SI NO LA TIENE O SI CAMBIÓ ---
+    if (principal.cedula && usuarioDB.cedula !== principal.cedula) {
+      await usuarioDB.update({ cedula: principal.cedula });
+    }
+
+    // 3. Validar que el vuelo existe
     const vuelo = await VueloOferta.findByPk(id_vuelo);
     if (!vuelo) return res.status(404).json({ message: "Vuelo no encontrado" });
 
-    // 2. Construir lista de pasajeros
-    // 2. Construir lista de pasajeros
-let nombreReal = "Pasajero Principal";
-
-// Verificamos qué campos tiene el objeto usuario que viene del token
-    if (usuario.nombre_completo) {
-      nombreReal = usuario.nombre_completo;
-    } else if (usuario.nombre && usuario.apellido) {
-      nombreReal = `${usuario.nombre} ${usuario.apellido}`;
-    } else if (usuario.nombre) {
-      nombreReal = usuario.nombre;
-    }
-
-    let listaPasajeros = [{
-      nombre_completo: nombreReal, 
-      documento: usuario.documento || "N/A",
-      asiento: asiento,
-    }];
-
-    if (Array.isArray(pasajeros_adicionales)) {
-      pasajeros_adicionales.forEach(p => {
-        listaPasajeros.push({
-          nombre_completo: p.nombre_completo,
-          documento: p.documento,
-          asiento: p.asiento
-        });
-      });
-    }
-
-    // 3. Validar duplicados en la petición
+    // 4. Validar disponibilidad de asientos en DB
     const todosLosAsientos = listaPasajeros.map(p => p.asiento);
-    if (new Set(todosLosAsientos).size !== todosLosAsientos.length) {
-      return res.status(400).json({ message: "No puedes duplicar asientos en la misma reserva" });
-    }
-
-    // 4. Validar disponibilidad en DB
     const ocupados = await Pasajero.findAll({
-      include: [{ 
-        model: Reserva, 
-        as: "reserva", 
-        where: { id_vuelo } 
-      }],
+      include: [{ model: Reserva, as: "reserva", where: { id_vuelo } }],
       where: { asiento: todosLosAsientos }
     });
 
@@ -82,16 +56,16 @@ let nombreReal = "Pasajero Principal";
 
     // 5. Crear Reserva
     const reserva = await Reserva.create({
-      id_usuario: usuario.id,
+      id_usuario: id_usuario,
       id_vuelo: id_vuelo,
       total: vuelo.precio * listaPasajeros.length,
       estado: "PENDIENTE"
     });
 
-    // 6. Crear Pasajeros vinculados
+    // 6. Crear Pasajeros vinculados usando los nombres y documentos que vienen del FRONT
     const pasajerosFinal = listaPasajeros.map(p => ({
-      nombre_completo: p.nombre_completo,
-      documento: p.documento,
+      nombre_completo: p.nombre, // 'nombre' es como viene de tu PasajeroScreen
+      documento: p.cedula,       // 'cedula' es como viene de tu PasajeroScreen
       asiento: p.asiento,
       id_reserva: reserva.id_reserva
     }));
@@ -99,14 +73,14 @@ let nombreReal = "Pasajero Principal";
     await Pasajero.bulkCreate(pasajerosFinal);
 
     res.status(201).json({ 
-      message: "Reserva creada correctamente", 
+      message: "Reserva creada y perfil actualizado", 
       id_reserva: reserva.id_reserva,
       total: reserva.total 
     });
 
   } catch (error) {
-    console.error("DETALLE DEL ERROR EN CONSOLA:", error); // Esto te dirá el error real en tu terminal
-    res.status(500).json({ message: "Error interno al procesar reserva", error: error.message });
+    console.error("ERROR EN CREAR RESERVA:", error);
+    res.status(500).json({ message: "Error interno", error: error.message });
   }
 };
 

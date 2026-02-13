@@ -130,7 +130,8 @@ const login = async (req, res) => {
         puntos: usuario.puntos,
         rol: usuario.rol ,
         foto: usuario.foto,
-        telefono: usuario.telefono
+        telefono: usuario.telefono,
+        cedula: usuario.cedula
       }
     });
 

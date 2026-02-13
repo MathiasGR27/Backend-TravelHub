@@ -10,6 +10,11 @@ const Usuario = sequelize.define("Usuario", {
     type: DataTypes.TEXT,
     allowNull: false
   },
+  cedula: { 
+  type: DataTypes.TEXT,
+  allowNull: true, 
+  unique: true
+  },
   foto: {
     type: DataTypes.TEXT, 
     allowNull: true,      
